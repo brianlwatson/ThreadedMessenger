@@ -13,10 +13,10 @@ CCFLAGS= -g
 all:	echo-server echo-client
 
 echo-server:$(ECHO-SERVER)
-	$(CXX) -o server $(ECHO-SERVER) $(LIBS)
+	$(CXX) -o msgd $(ECHO-SERVER) $(LIBS)
 
 echo-client:$(ECHO-CLIENT)
-	$(CXX) -o client $(ECHO-CLIENT) $(LIBS)
+	$(CXX) -o msg $(ECHO-CLIENT) $(LIBS)
 
 clean:
 	rm -f $(OBJS) $(OBJS:.o=.d)
