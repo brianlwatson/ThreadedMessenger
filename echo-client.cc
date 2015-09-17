@@ -30,7 +30,7 @@ main(int argc, char **argv)
                 debug = 1;
                 break;
             default:
-                cout << "client [-h host] [-p port]" << endl;
+                cout << "client [-s server] [-p port]" << endl;
                 exit(EXIT_FAILURE);
         }
     }
@@ -41,8 +41,8 @@ main(int argc, char **argv)
     {
         client.enable_debugging();
     }
-    
-    cout << "Starting Client -p[" << port << "] -h[" << host << "] -d [" << debug << "]" << endl; 
+
+    cout << "Starting Client -p[" << port << "] -s[" << host << "] -d [" << debug << "]" << endl; 
 
     client.run();
 }
