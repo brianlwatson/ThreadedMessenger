@@ -1,0 +1,658 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"fmsGetNext",
+				"fmsGetNextDirEntry"
+			],
+			[
+				"find",
+				"findEmptyEntry"
+			],
+			[
+				"print",
+				"printOFTableNames"
+			],
+			[
+				"disk",
+				"diskMounted"
+			],
+			[
+				"sector",
+				"sectorindex"
+			],
+			[
+				"BEG_",
+				"BEG_DATA_SECTOR"
+			],
+			[
+				"BEG",
+				"BEG_ROOT_SECTOR"
+			],
+			[
+				"att",
+				"attribute"
+			],
+			[
+				"fmsget",
+				"fmsGetNextDirEntry"
+			],
+			[
+				"get",
+				"getFreeFatEntry"
+			],
+			[
+				"size",
+				"sizeof"
+			],
+			[
+				"num",
+				"numBytesWritten"
+			],
+			[
+				"En",
+				"ENTRIES_PER_SECTOR"
+			],
+			[
+				"temp",
+				"tempPointer"
+			],
+			[
+				"setFat",
+				"setFatEntry"
+			],
+			[
+				"error",
+				"error"
+			],
+			[
+				"pri",
+				"printOFTableNames"
+			],
+			[
+				"check",
+				"checkDefinedInSector"
+			],
+			[
+				"Dir",
+				"DirEntry"
+			],
+			[
+				"fmsGet",
+				"fmsGetNextDirEntry"
+			],
+			[
+				"current",
+				"currentCluster"
+			],
+			[
+				"free",
+				"freesector"
+			],
+			[
+				"fin",
+				"findEmptyFat"
+			],
+			[
+				"che",
+				"checkDefinedInSector"
+			],
+			[
+				"fix",
+				"fixTimeDispersion"
+			],
+			[
+				"recompute",
+				"recompute_holder"
+			],
+			[
+				"inBuffer",
+				"inBufferReady"
+			],
+			[
+				"rpta",
+				"rpta"
+			],
+			[
+				"numIn",
+				"numInGiftShop"
+			],
+			[
+				"driver",
+				"driverDoneSemaphore"
+			],
+			[
+				"inBuf",
+				"inBufIndx"
+			],
+			[
+				"inB",
+				"inBufIndx"
+			],
+			[
+				"my",
+				"mySIGCONT"
+			],
+			[
+				"sigT",
+				"sigTermHandler"
+			],
+			[
+				"defaultSig",
+				"defaultSigTermHandler"
+			],
+			[
+				"default",
+				"defaultSigTstpHandler"
+			],
+			[
+				"sig",
+				"sigIntHandler"
+			],
+			[
+				"string",
+				"string_is_whitespace"
+			],
+			[
+				"INBUF",
+				"INBUF_SIZE"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "server.cc",
+			"settings":
+			{
+				"buffer_size": 6046,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "client.cc",
+			"settings":
+			{
+				"buffer_size": 4703,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "client.h",
+			"settings":
+			{
+				"buffer_size": 596,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "server.h",
+			"settings":
+			{
+				"buffer_size": 633,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/brian/Desktop/CS360_1/echo"
+	],
+	"file_history":
+	[
+		"/home/brian/Desktop/CS360_1/unix-echo/client.cc",
+		"/home/brian/Desktop/CS360_1/echo/server.h",
+		"/home/brian/Desktop/CS360_1/echo/client.h",
+		"/home/brian/Desktop/CS360_1/unix-echo/client.h",
+		"/home/brian/Desktop/CS360_1/unix-echo/server.h",
+		"/home/brian/Desktop/CS360_1/unix-echo/Message.h",
+		"/home/brian/Desktop/CS360_1/unix-echo/server.cc",
+		"/home/brian/Desktop/CS360_1/unix-echo/unix-client.h",
+		"/home/brian/Desktop/CS345/os345interrupts.c",
+		"/home/brian/Desktop/CS345/os345signals.c",
+		"/home/brian/Desktop/CS345/os345p1.c",
+		"/home/brian/Desktop/CS360_1/unix-echo/message.h",
+		"/home/brian/Desktop/CS345/os345fat.h",
+		"/home/brian/Desktop/CS345/os345p6.c",
+		"/home/brian/Desktop/CS345/os345.c",
+		"/home/brian/Desktop/CS345/os345tasks.c",
+		"/home/brian/Desktop/CS345/os345p3.c",
+		"/home/brian/Desktop/CS345/os345fat.c",
+		"/home/brian/Desktop/CS345/os345semaphores.c",
+		"/home/brian/Desktop/CS345/os345mmu.c",
+		"/home/brian/Desktop/CS345/DeltaClock.c",
+		"/home/brian/Desktop/CS345/os345queue.c",
+		"/home/brian/Desktop/CS345/os345.h",
+		"/home/brian/Desktop/CS345/os345lc3.c",
+		"/home/brian/Desktop/CS345/os345queue.h",
+		"/home/brian/Desktop/CS345/os345p5.c",
+		"/home/brian/Desktop/CS345/os345p2.c",
+		"/home/brian/Desktop/CS345/os345p4.c",
+		"/home/brian/Desktop/CS345/DeltaClock.h",
+		"/home/brian/Desktop/CS345/os345lc3.h",
+		"/home/brian/Desktop/CS345/os345park.h",
+		"/home/brian/Desktop/HW02.c",
+		"/home/brian/Desktop/CS345/os345signals.h",
+		"/home/brian/Desktop/CS345/os345config.h"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"/home/brian/Desktop/CS360_1/unix-echo"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"parse_request",
+			"response:",
+			"response",
+			"could",
+			"send",
+			"3000",
+			"port",
+			"socket",
+			"malloc",
+			"cout",
+			"echo",
+			"send_request",
+			"carId",
+			"carTask",
+			"setFatEntry",
+			"FAT1",
+			"p6_chkdsk",
+			"FAT1",
+			"ERR69",
+			"FAT1",
+			"fmsDelete",
+			"fmsGetNextDir",
+			"P6_dir",
+			"fmsD",
+			"fmsDefine",
+			"fmsChangeDir",
+			"visitors",
+			"curVisitor",
+			"spotIn",
+			"timeEvent",
+			"needDriver",
+			"semSignal",
+			"semWait",
+			"ticketbooth",
+			"carTicket",
+			"driver",
+			"driverID",
+			"spotInMuseum",
+			"spotInGiftShop",
+			"spotInPark",
+			"needDriver",
+			"needTicket",
+			"takeTicket",
+			"seatTaken",
+			"fmsdefine",
+			"P6_open",
+			"p6_ren",
+			"p6",
+			"fmsMask",
+			"rename",
+			"ERR61",
+			"printdirectoryentry",
+			"bufferindex = 0",
+			"bufferindex ",
+			"for(buff",
+			"printDirectoryEntry",
+			"P6_dir",
+			"fmsmask",
+			"fmsdel",
+			"dir",
+			"fmsdel",
+			"ERR50",
+			"name",
+			"isvalid",
+			"validn",
+			"valid",
+			"findEmptyCluster",
+			"checkName",
+			"setFatEntries",
+			"fmsgetnextdirentrywr",
+			"fmsgetnextdirentry",
+			"fms",
+			"fmsGetNextDirEntry(",
+			"fmsGetNextDir",
+			"fmsdel",
+			"fmsDel",
+			"p6_op",
+			"read-only",
+			"write",
+			"fmsReadSector",
+			"readSector",
+			"fmsdefine",
+			"seek",
+			"p6_",
+			"NULL",
+			"decode",
+			"C_2_S",
+			"C_2",
+			"findEmptyF",
+			"fmsRead",
+			"fdEntryM",
+			"fmsGetNextDir",
+			"setFat",
+			"P6_wr",
+			"P6_finalT",
+			"p6_seek",
+			"P6_op",
+			"CDIR",
+			"readSector",
+			"final",
+			"P6_open",
+			"P6_op",
+			"P6",
+			"open",
+			"compareFileNames",
+			"while(1)",
+			"dirCluster == FAT",
+			"fms",
+			"set",
+			"fmsSet",
+			"fmsGetDir",
+			"fmsGet",
+			"fmsSet",
+			"fmsClose",
+			"OPEN_APPEND",
+			"CDIR",
+			"OFT",
+			"open",
+			"ERR63",
+			"ERR66",
+			"fmsGetNext",
+			"fileName",
+			"dirPath",
+			"fmsMount",
+			"fmsDefineFile(",
+			"fmsDefineFile",
+			"deQ",
+			"deQtop"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"visitor_count",
+			"visitorID",
+			"occupancy",
+			"deltaItemExpired",
+			"needDriverMutex",
+			"SEM_SIGNAL",
+			"SEM_WAIT",
+			"ticket_ride",
+			"driver_ID",
+			"MuseumOccupancy",
+			"GiftShopOccupancy",
+			"ParkOccupancy",
+			"signalDriver",
+			"signalTicket",
+			"consumeTicket",
+			"sigSeat",
+			"	{",
+			"getPassenger"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "server.cc",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6046,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5218,
+								5218
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3273.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "client.cc",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4703,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2379,
+								2379
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1471.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "client.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 596,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								456,
+								456
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "server.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 633,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								336,
+								336
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "client.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
