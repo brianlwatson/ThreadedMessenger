@@ -31,7 +31,6 @@ protected:
     string parse_request(string);
     string parse_response(string);
 
-
     int debugging_flag;
     int server_;
     int buflen_;

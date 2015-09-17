@@ -224,6 +224,8 @@ Server::parse_request(string buf_, int client)
                         request_ss << messages[i].getSubject() << " ";
                         request_ss << messages[i].getMsg().size() << "\n";
                         request_ss << messages[i].getMsg();
+                        
+                        
                         request = request_ss.str() ;
                         return request;
                 }
@@ -292,10 +294,6 @@ bool
 Server::send_response(int client, string response) {
     // prepare to send response
 
-    //cout <<"SENDING: " << response << "~~~~~~~~~~~" << endl;
-
-    //response = parse_request(response, client);
-
     const char* ptr = response.c_str();
     int nleft = response.length();
     int nwritten;
@@ -354,7 +352,7 @@ Server::get_longrequest(int client, int length) {
 
     string request = cache_.substr(0, length + 1);
     cache_.erase(0, length + 1);
-
+    cache_ = "";
     return request;
     //return substring of cache
 }

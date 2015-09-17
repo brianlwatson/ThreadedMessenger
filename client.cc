@@ -5,7 +5,7 @@ using namespace std;
 
 Client::Client() {
     // setup variables
-    buflen_ = 1024;
+    buflen_ = 1024 * 10;
     buf_ = new char[buflen_+1];
     debugging_flag = 0;
 }
@@ -69,10 +69,15 @@ Client::echo() {
         if (not success)
             break;
         }
-   
+
+        else
+        {
+            cout << line;
+        }
 
         cout << "% ";
     }
+
     close_socket();
 }
 
@@ -109,7 +114,7 @@ Client::get_response() {
     // read until we get a newline
     while (response.find("\n") == string::npos) {
 
-        int nread = recv(server_,buf_,1024,0);
+        int nread = recv(server_,buf_,1024 * 10,0);
         if (nread < 0) {
             if (errno == EINTR)
                 // the socket call was interrupted -- try again
@@ -122,12 +127,12 @@ Client::get_response() {
             return "";
         }
         // be sure to use append in case we have binary data
-
         response.append(buf_,nread);
     }
     // a better client would cut off anything after the newline and
     // save it in a cache
     
+   
     parse_response(response);
     //cout << response;
     return true;
@@ -240,6 +245,7 @@ string Client::parse_request(string temp)
 
 string Client::parse_response(string resp)
 {
+
     istringstream iss(resp);
 
     string parsed;
