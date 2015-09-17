@@ -209,6 +209,12 @@ Server::parse_request(string buf_, int client)
             contents >> desired_index;
             int des_index = atoi(desired_index.c_str());
 
+            if(desired_index == "")
+            {
+                request = "error - No index specified\n";
+            }
+
+
             for(int i = 0; i < messages.size(); i++)
             {
                 if(messages[i].getName() == name && des_index == messages[i].getIndex())
@@ -228,6 +234,11 @@ Server::parse_request(string buf_, int client)
                 }
             }
             return request;
+        }
+
+        else if(request_type == "error")
+        {
+            return buf_;
         }
 
      return "error - invalid command\n";

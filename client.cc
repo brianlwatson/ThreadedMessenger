@@ -61,22 +61,17 @@ Client::echo() {
             break;
         // get a response
 
-        if(debugging_flag) cout <<"*1\n";
 
         success = get_response();             //THIS IS VITAL
         // break if an error occurred
 
-        if(debugging_flag)  cout << "*2\n";
 
         if (not success)
             break;
         }
-        else
-        {
-            cout << line;
-        }
+   
 
-        cout << "\n% ";
+        cout << "% ";
     }
     close_socket();
 }
@@ -133,7 +128,8 @@ Client::get_response() {
     // a better client would cut off anything after the newline and
     // save it in a cache
     
-    cout << response;
+    parse_response(response);
+    //cout << response;
     return true;
 }
 
@@ -244,17 +240,40 @@ string Client::parse_request(string temp)
 
 string Client::parse_response(string resp)
 {
-    string p_resp = "";
-    int i = 0;
+    istringstream iss(resp);
 
-    while(resp[i] != '~'  && i < resp.size() )
+    string parsed;
+
+    string type;
+    iss >> type;
+    if(type == "OK") //result of a valid send.
     {
-        p_resp = p_resp + resp[i];
-        
-        i++;
+        parsed = "";
     }
 
-    return p_resp;
+    if(type == "error")
+    {
+        cout << resp;
+        return resp; //return original string if error.
+    }
+
+    if(type == "list")
+    {
+        int index = resp.find("\n");
+         parsed = resp.erase(0,index + 1);
+       
+    }
+
+    if(type == "message")
+    {
+          int index = resp.find("\n");
+         parsed = resp.erase(0,index + 1);
+         parsed += "\n";
+    }
+
+    cout << parsed;
+ 
+    return parsed;
 
 }
 
