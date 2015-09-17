@@ -31,8 +31,8 @@ protected:
 
 	vector<Message> messages;
 
-    string parse_request(string);
-    
+    string parse_request(string, int);
+    string get_longrequest(int, int);
     int sdebugging_flag;
     int server_;
     int buflen_;

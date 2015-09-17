@@ -57,7 +57,10 @@ Server::handle(int client) {
             break;
         // send response
 
-        bool success = send_response(client,request);
+        string response = parse_request(request, client);
+
+
+        bool success = send_response(client,response);
         // break if an error occurred
         if (not success)
             break;
@@ -66,7 +69,7 @@ Server::handle(int client) {
 }
 
 string
-Server::parse_request(string buf_) 
+Server::parse_request(string buf_, int client) 
 {
     string request = "";
  //put this whole block of parsing into handle, right before the response is sent.
@@ -74,7 +77,6 @@ Server::parse_request(string buf_)
 
         string request_type;
         contents >> request_type;
-        //cout << contents.str() << endl; //Repeats contents
 
         if(sdebugging_flag)
         {
@@ -84,7 +86,6 @@ Server::parse_request(string buf_)
 
         if(request_type == "reset")
         {
-            //cout << "OK\n";// << endl;
             request = "OK\n";
             messages.clear();
             return request;
@@ -127,6 +128,16 @@ Server::parse_request(string buf_)
                 }
             }
 
+            int lengthi = atoi(length.c_str());
+
+
+            if(lengthi > 1023) 
+            {
+                //cout << "GETLONG: " << get_longrequest(client,lengthi) << endl;
+                temp = get_longrequest(client, lengthi);
+            }   
+
+
             Message m(name,subject, temp, matches + 1);
            // m.toString(); //test to see the contents of the message
             
@@ -136,12 +147,12 @@ Server::parse_request(string buf_)
             
             if(sdebugging_flag)
             {
-               // cout << "put: " << name << " " << subject<< " " << "req: " << request << endl;
+                cout << "put: " << name << " " << subject<< " " << "req: " << request << endl;
             }
 
             if(before == messages.size() - 1)
             {
-            request = "OK\n";
+                 request = "OK\n";
             }
             else
             {
@@ -152,8 +163,6 @@ Server::parse_request(string buf_)
 
         else if(request_type == "list")
         {
-           
-
             string name;
             contents >> name;
 
@@ -186,29 +195,12 @@ Server::parse_request(string buf_)
             big_out << "list " << matches << "\n";
             big_out << request_ss.rdbuf();
             request = big_out.str();
-            
-            if(sdebugging_flag)
-            {
-              /*  cout <<  big_out.str();
-
-
-                cout << "\nContents: " << name << endl;
-                for(int i = 0; i < messages.size(); i++)
-                {
-                    messages[i].toString();
-                }*/
-            }
-            //return request_ss.str();
+           
             return request;
         }
 
         else if(request_type == "get")
         {
-
-            if(sdebugging_flag)
-            {
-             //   cout << "getrequest: " << buf_ << endl;
-            }
 
             string name;
             contents >> name;
@@ -221,15 +213,11 @@ Server::parse_request(string buf_)
             {
                 if(messages[i].getName() == name && des_index == messages[i].getIndex())
                 {
-                       // cout << messages[i].getSubject() <<" " << messages[i].getMsg().size()<< endl;
-                       // cout << messages[i].getMsg()<<endl;
-
                         stringstream request_ss;
                         request_ss << "message ";
                         request_ss << messages[i].getSubject() << " ";
                         request_ss << messages[i].getMsg().size() << "\n";
                         request_ss << messages[i].getMsg();
-                       // return request_ss.str();
                         request = request_ss.str() ;
                         return request;
                 }
@@ -256,7 +244,6 @@ Server::get_request(int client) {
     while (request.find("\n") == string::npos) 
     {
         int nread = recv(client,buf_,1024,0);
-
         if (nread < 0) 
         {
             if (errno == EINTR)
@@ -273,12 +260,20 @@ Server::get_request(int client) {
             return "";
         }
         // be sure to use append in case we have binary data
-        request.append(buf_,nread);// - ???????
-     
+        cache_.append(buf_,nread);// - ???????
+        request.append(buf_,nread);
     }
 
     // a better server would cut off anything after the newline and
     // save it in a cache
+
+
+    int nlpos = cache_.find("\n");
+
+    // request = cache_.substr(0, nlpos + 1);
+    //trim cache_
+    cache_.erase(0, nlpos + 1);
+
     return request;
 }
 
@@ -288,7 +283,7 @@ Server::send_response(int client, string response) {
 
     //cout <<"SENDING: " << response << "~~~~~~~~~~~" << endl;
 
-    response = parse_request(response);
+    //response = parse_request(response, client);
 
     const char* ptr = response.c_str();
     int nleft = response.length();
@@ -320,4 +315,35 @@ Server::send_response(int client, string response) {
 void Server::enable_sdebugging()
 {
     sdebugging_flag = 1;
+}
+
+string
+Server::get_longrequest(int client, int length) {
+    // read until we get a newline
+
+    while (cache_.size() < length) {//check size
+        int nread = recv(client,buf_,1024,0);
+        if (nread < 0) {
+            if (errno == EINTR)
+                // the socket call was interrupted -- try again
+                continue;
+            else
+                // an error occurred, so break out
+                return "";
+        } else if (nread == 0) {
+            // the socket is closed
+            return "";
+        }
+        // be sure to use append in case we have binary data
+        cache_.append(buf_,nread);
+    }
+    // a better server would cut off anything after the newline and
+    // save it in a cache
+    //change request to cache
+
+    string request = cache_.substr(0, length + 1);
+    cache_.erase(0, length + 1);
+
+    return request;
+    //return substring of cache
 }
