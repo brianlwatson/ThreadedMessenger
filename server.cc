@@ -225,8 +225,7 @@ Server::parse_request(string buf_, int client)
                         request_ss << messages[i].getMsg().size() << "\n";
                         request_ss << messages[i].getMsg();
                         
-                        
-                        request = request_ss.str() ;
+                        request = request_ss.str();
                         return request;
                 }
                 else

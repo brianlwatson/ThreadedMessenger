@@ -272,11 +272,12 @@ string Client::parse_response(string resp)
 
     if(type == "message")
     {
+        string subject;
+        iss >> subject;
           int index = resp.find("\n");
-         parsed = resp.erase(0,index + 1);
+         parsed = subject + "\n" + resp.erase(0,index + 1);
          parsed += "\n";
     }
-
     cout << parsed;
  
     return parsed;
