@@ -44,10 +44,11 @@ Server::serve() {
 
     sem_init(&queue_lock, 0, 1); // init open
     sem_init(&message_lock,0 , 1); //init locked
-    sem_init(&n, 0, 0);
+    sem_init(&not_full, 0, 0);
+    sem_init(&not_empty, 0, thread_count);
 
 
-    for (int i=0; i<thread_count; i++) 
+    for (int i=0; i<10; i++) 
     {
             pthread_t* thread = new pthread_t;
             pthread_create(thread, NULL, Server::callExecute, this);
@@ -58,18 +59,22 @@ Server::serve() {
     {
         if((client = accept(server_,(struct sockaddr *)&client_addr,&clientlen)) > 0)
         {
-            cout << "CLIENT: " << client << endl;
+           
+           
+                sem_wait(&not_empty);
+            
             sem_wait(&queue_lock);
             clients.push(client);
             sem_post(&queue_lock);
-            sem_post(&n);
+            sem_post(&not_full);
+            
         }
     }
 
     sem_close(&message_lock);
     sem_close(&queue_lock);
-    sem_close(&n);
-
+    //sem_close(&n);
+    cout << "HERERERERE: " << endl;
     close_socket();
 }
 
@@ -79,12 +84,15 @@ void* Server::thread_execute()
 {
     while(1)
     {
-        cout << "Thread executing : " << pthread_self() << endl;
-        sem_wait(&n);
+          sem_wait(&not_full);  
+        
+
         sem_wait(&queue_lock);
         int client = clients.front();        
         clients.pop();
+
         sem_post(&queue_lock);
+        sem_post(&not_empty);
         handle(client); //thread should die here 
     }
 

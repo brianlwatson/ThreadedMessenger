@@ -60,8 +60,8 @@ protected:
 
     sem_t message_lock;    //critical section for modifying message storage
     sem_t queue_lock;      //critical section for modifying threadpool
-    sem_t n;      //critical section for thread synch
-    sem_t e;          //critical section for thread synch
+    sem_t not_full;      //critical section for thread synch
+    sem_t not_empty;          //critical section for thread synch
 
     queue<int> clients;
     queue<int> clients2;
