@@ -101,4 +101,12 @@ inet-server.o inet-server.d : inet-server.cc inet-server.h /usr/include/netinet/
  /usr/include/c++/4.6/bits/locale_facets.tcc \
  /usr/include/c++/4.6/bits/basic_ios.tcc \
  /usr/include/c++/4.6/bits/ostream.tcc /usr/include/c++/4.6/istream \
- /usr/include/c++/4.6/bits/istream.tcc
+ /usr/include/c++/4.6/bits/istream.tcc /usr/include/semaphore.h \
+ /usr/include/x86_64-linux-gnu/bits/semaphore.h \
+ /usr/include/c++/4.6/queue /usr/include/c++/4.6/deque \
+ /usr/include/c++/4.6/bits/stl_deque.h \
+ /usr/include/c++/4.6/bits/deque.tcc /usr/include/c++/4.6/bits/stl_heap.h \
+ /usr/include/c++/4.6/bits/stl_queue.h /usr/include/c++/4.6/sstream \
+ /usr/include/c++/4.6/bits/sstream.tcc /usr/include/fcntl.h \
+ /usr/include/x86_64-linux-gnu/bits/fcntl.h \
+ /usr/include/x86_64-linux-gnu/bits/stat.h

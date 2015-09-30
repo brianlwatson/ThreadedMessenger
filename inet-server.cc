@@ -11,7 +11,7 @@ InetServer::~InetServer() {
 void
 InetServer::create() {
     struct sockaddr_in server_addr;
-
+	
     // setup socket address structure
     memset(&server_addr,0,sizeof(server_addr));
     server_addr.sin_family = AF_INET;

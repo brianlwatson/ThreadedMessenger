@@ -13,7 +13,7 @@ CCFLAGS= -g
 all:	echo-server echo-client
 
 echo-server:$(ECHO-SERVER)
-	$(CXX) -o msgd $(ECHO-SERVER) $(LIBS)
+	$(CXX) -std=c++11 -o msgd $(ECHO-SERVER) $(LIBS) -pthread 
 
 echo-client:$(ECHO-CLIENT)
 	$(CXX) -o msg $(ECHO-CLIENT) $(LIBS)

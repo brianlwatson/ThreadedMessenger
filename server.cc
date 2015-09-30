@@ -1,19 +1,23 @@
 #include "server.h"
-#include<sstream>
-#include<iostream>
-using namespace std;
-
-
+#include <semaphore.h>
+#include <stack>
+#include <queue>
+#include <ostream>
 
 Server::Server() {
     // setup variables
     buflen_ = 1024;
     sdebugging_flag = 0;
     buf_ = new char[buflen_+1];
+    thread_count = 10;
 }
 
-Server::~Server() {
+
+Server::~Server() 
+{
     delete buf_;
+
+
 }
 
 void
@@ -38,13 +42,54 @@ Server::serve() {
     struct sockaddr_in client_addr;
     socklen_t clientlen = sizeof(client_addr);
 
-      // accept clients
-    while ((client = accept(server_,(struct sockaddr *)&client_addr,&clientlen)) > 0) {
+    sem_init(&queue_lock, 0, 1); // init open
+    sem_init(&message_lock,0 , 1); //init locked
+    sem_init(&n, 0, 0);
 
-        handle(client);
+
+    for (int i=0; i<thread_count; i++) 
+    {
+            pthread_t* thread = new pthread_t;
+            pthread_create(thread, NULL, Server::callExecute, this);
+            threads.push(thread);
     }
+
+    while (1)
+    {
+        if((client = accept(server_,(struct sockaddr *)&client_addr,&clientlen)) > 0)
+        {
+            cout << "CLIENT: " << client << endl;
+            sem_wait(&queue_lock);
+            clients.push(client);
+            sem_post(&queue_lock);
+            sem_post(&n);
+        }
+    }
+
+    sem_close(&message_lock);
+    sem_close(&queue_lock);
+    sem_close(&n);
+
     close_socket();
 }
+
+
+
+void* Server::thread_execute()
+{
+    while(1)
+    {
+        cout << "Thread executing : " << pthread_self() << endl;
+        sem_wait(&n);
+        sem_wait(&queue_lock);
+        int client = clients.front();        
+        clients.pop();
+        sem_post(&queue_lock);
+        handle(client); //thread should die here 
+    }
+
+}
+
 
 void
 Server::handle(int client) {
@@ -58,7 +103,6 @@ Server::handle(int client) {
         // send response
 
         string response = parse_request(request, client);
-
 
         bool success = send_response(client,response);
         // break if an error occurred
@@ -87,7 +131,9 @@ Server::parse_request(string buf_, int client)
         if(request_type == "reset")
         {
             request = "OK\n";
+            sem_wait(&message_lock);
             messages.clear();
+            sem_post(&message_lock);
             return request;
         }
 
@@ -120,6 +166,7 @@ Server::parse_request(string buf_, int client)
             temp.erase(0,1); //erase the first space (laziness)
 
             int matches = 0; //assign the index
+            sem_wait(&message_lock);
             for(int i = 0; i < messages.size(); i++)
             {
                 if(messages[i].getName() == name)
@@ -127,7 +174,7 @@ Server::parse_request(string buf_, int client)
                     matches++;
                 }
             }
-
+            sem_post(&message_lock);
             int lengthi = atoi(length.c_str());
 
 
@@ -141,6 +188,7 @@ Server::parse_request(string buf_, int client)
             Message m(name,subject, temp, matches + 1);
            // m.toString(); //test to see the contents of the message
             
+            sem_wait(&message_lock);
             int before = messages.size();
             messages.push_back(m);
             
@@ -158,6 +206,7 @@ Server::parse_request(string buf_, int client)
             {
                 request = "error - not added\n";
             }
+            sem_post(&message_lock);
             return request;
         }
 
@@ -181,6 +230,8 @@ Server::parse_request(string buf_, int client)
 
             int matches = 0;
             int found = 0;
+
+            sem_wait(&message_lock);
             for(int i = 0; i < messages.size(); i++)
             {
                 if(messages[i].getName() == name)
@@ -191,6 +242,7 @@ Server::parse_request(string buf_, int client)
 
                 }
             }
+            sem_post(&message_lock);
             stringstream big_out;
             big_out << "list " << matches << "\n";
             big_out << request_ss.rdbuf();
@@ -214,7 +266,7 @@ Server::parse_request(string buf_, int client)
                 request = "error - No index specified\n";
             }
 
-
+            sem_wait(&message_lock);
             for(int i = 0; i < messages.size(); i++)
             {
                 if(messages[i].getName() == name && des_index == messages[i].getIndex())
@@ -226,6 +278,7 @@ Server::parse_request(string buf_, int client)
                         request_ss << messages[i].getMsg();
                         
                         request = request_ss.str();
+                        sem_post(&message_lock);
                         return request;
                 }
                 else
@@ -234,6 +287,7 @@ Server::parse_request(string buf_, int client)
                         //break;
                 }
             }
+            sem_post(&message_lock);
             return request;
         }
 
@@ -326,7 +380,8 @@ void Server::enable_sdebugging()
 }
 
 string
-Server::get_longrequest(int client, int length) {
+Server::get_longrequest(int client, int length) 
+{
     // read until we get a newline
 
     while (cache_.size() < length) {//check size
@@ -355,3 +410,17 @@ Server::get_longrequest(int client, int length) {
     return request;
     //return substring of cache
 }
+
+
+void Server::printqueue(queue<int> clients)
+{
+    cout <<"QUEUE: " ;
+    while(!clients.empty())
+    {
+        int i;
+        i = clients.front();
+        cout << i << ", " ;
+        clients.pop();
+    }
+}
+
