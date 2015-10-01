@@ -16,8 +16,6 @@ Server::Server() {
 Server::~Server() 
 {
     delete buf_;
-
-
 }
 
 void
@@ -59,15 +57,11 @@ Server::serve() {
     {
         if((client = accept(server_,(struct sockaddr *)&client_addr,&clientlen)) > 0)
         {
-           
-           
-                sem_wait(&not_empty);
-            
+            sem_wait(&not_empty);
             sem_wait(&queue_lock);
             clients.push(client);
             sem_post(&queue_lock);
             sem_post(&not_full);
-            
         }
     }
 
@@ -84,13 +78,10 @@ void* Server::thread_execute()
 {
     while(1)
     {
-          sem_wait(&not_full);  
-        
-
+        sem_wait(&not_full);  
         sem_wait(&queue_lock);
         int client = clients.front();        
         clients.pop();
-
         sem_post(&queue_lock);
         sem_post(&not_empty);
         handle(client); //thread should die here 
@@ -139,9 +130,9 @@ Server::parse_request(string buf_, int client)
         if(request_type == "reset")
         {
             request = "OK\n";
-            sem_wait(&message_lock);
+        sem_wait(&message_lock);
             messages.clear();
-            sem_post(&message_lock);
+        sem_post(&message_lock);
             return request;
         }
 
@@ -174,7 +165,7 @@ Server::parse_request(string buf_, int client)
             temp.erase(0,1); //erase the first space (laziness)
 
             int matches = 0; //assign the index
-            sem_wait(&message_lock);
+        sem_wait(&message_lock);
             for(int i = 0; i < messages.size(); i++)
             {
                 if(messages[i].getName() == name)
@@ -182,13 +173,12 @@ Server::parse_request(string buf_, int client)
                     matches++;
                 }
             }
-            sem_post(&message_lock);
+        sem_post(&message_lock);
             int lengthi = atoi(length.c_str());
 
 
             if(lengthi > 1023) 
             {
-                //cout << "GETLONG: " << get_longrequest(client,lengthi) << endl;
                 temp = get_longrequest(client, lengthi);
             }   
 
@@ -196,17 +186,18 @@ Server::parse_request(string buf_, int client)
             Message m(name,subject, temp, matches + 1);
            // m.toString(); //test to see the contents of the message
             
-            sem_wait(&message_lock);
+        sem_wait(&message_lock);
             int before = messages.size();
             messages.push_back(m);
-            
+            int after = messages.size();
+        sem_post(&message_lock);
             
             if(sdebugging_flag)
             {
                 cout << "put: " << name << " " << subject<< " " << "req: " << request << endl;
             }
 
-            if(before == messages.size() - 1)
+            if(before == after - 1)
             {
                  request = "OK\n";
             }
@@ -214,7 +205,7 @@ Server::parse_request(string buf_, int client)
             {
                 request = "error - not added\n";
             }
-            sem_post(&message_lock);
+            
             return request;
         }
 
@@ -239,18 +230,18 @@ Server::parse_request(string buf_, int client)
             int matches = 0;
             int found = 0;
 
-            sem_wait(&message_lock);
+        sem_wait(&message_lock);
             for(int i = 0; i < messages.size(); i++)
             {
                 if(messages[i].getName() == name)
                 {
                     matches ++;
-                    //cout << messages[i].getIndex() << " " << messages[i].getSubject() << endl;
                     request_ss << messages[i].getIndex() << " " << messages[i].getSubject() << "\n";
 
                 }
             }
-            sem_post(&message_lock);
+        sem_post(&message_lock);
+
             stringstream big_out;
             big_out << "list " << matches << "\n";
             big_out << request_ss.rdbuf();
@@ -274,7 +265,7 @@ Server::parse_request(string buf_, int client)
                 request = "error - No index specified\n";
             }
 
-            sem_wait(&message_lock);
+        sem_wait(&message_lock);
             for(int i = 0; i < messages.size(); i++)
             {
                 if(messages[i].getName() == name && des_index == messages[i].getIndex())
@@ -286,7 +277,7 @@ Server::parse_request(string buf_, int client)
                         request_ss << messages[i].getMsg();
                         
                         request = request_ss.str();
-                        sem_post(&message_lock);
+        sem_post(&message_lock);
                         return request;
                 }
                 else
@@ -295,7 +286,8 @@ Server::parse_request(string buf_, int client)
                         //break;
                 }
             }
-            sem_post(&message_lock);
+
+        sem_post(&message_lock);
             return request;
         }
 
