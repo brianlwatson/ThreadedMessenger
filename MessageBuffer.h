@@ -8,7 +8,7 @@ class MessageBuffer
 	private:
 	
 		int server_;
-		string cache_;
+		string cache;
 		string request;
 		char* buf_;
 		int client_socket;
@@ -46,21 +46,21 @@ class MessageBuffer
 			return buf_;
 		}
 		
+		void setBuf(char* b)
+		{
+			buf_ = b;
+		}
+
 		string getCache()
 		{
-			return cache_;
+			return cache;
 		}
 		
 		void setCache(string c)
 		{
-			cache_ = c;
+			cache = c;
 		}
-		
-		void setBuf(char* buf)
-		{
-			buf_  = buf;
-		}
-		
+				
 		int getSocket()
 		{
 			return client_socket;

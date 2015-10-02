@@ -131,33 +131,12 @@ string Server::mReset( MessageBuffer mb)
 	return "OK\n";
 }
 
-
-
-string
-Server::parse_request(string buf_, int client, MessageBuffer mb) 
+string Server::mPut(string req, MessageBuffer mb)
 {
-    string request = "";
- //put this whole block of parsing into handle, right before the response is sent.
-        stringstream contents(buf_);
-
-        string request_type;
-        contents >> request_type;
-
-        if(sdebugging_flag)
-        {
-           cout << "Request: " << buf_ << endl;
-        }
-
-
-        if(request_type == "reset")
-        {
-			string resetval = mReset(mb);
-            return resetval;
-        }
-
-        if(request_type == "put")
-        {
-            //put(contents.str());
+            stringstream contents(req);
+            string put;
+            contents >> put;
+            string request;
             string name;
             string subject;
             string message;
@@ -198,7 +177,7 @@ Server::parse_request(string buf_, int client, MessageBuffer mb)
 
             if(lengthi > 1023) 
             {
-                temp = get_longrequest(client, lengthi);
+                temp = get_longrequest(mb.getSocket(), lengthi, mb);
             }   
 
 
@@ -226,13 +205,17 @@ Server::parse_request(string buf_, int client, MessageBuffer mb)
             }
             
             return request;
-        }
+}
 
-        else if(request_type == "list")
-        {
+string Server::mList(string req, MessageBuffer mb)
+{
+        cout << "LIST REQUEST: " << req << "()()()"<< endl;
+            string request;
+            string request_type;
+            stringstream contents(req);
+            contents >> request_type;
             string name;
             contents >> name;
-
 
              if(sdebugging_flag)
             {
@@ -267,12 +250,17 @@ Server::parse_request(string buf_, int client, MessageBuffer mb)
             request = big_out.str();
            
             return request;
-        }
+}
 
-        else if(request_type == "get")
-        {
+string Server::mGet(string req, MessageBuffer mb)
+{
+    cout << "GET: " << req << endl;
+    string request;
+    stringstream contents(req);
+    string request_type;
+    contents >> request_type;
 
-            string name;
+     string name;
             contents >> name;
 
             string desired_index;
@@ -308,6 +296,50 @@ Server::parse_request(string buf_, int client, MessageBuffer mb)
 
         sem_post(&message_lock);
             return request;
+}
+
+
+string
+Server::parse_request(string buf, int client, MessageBuffer mb) 
+{
+
+    cout << "!" << buf << endl;
+    string request = "";
+ //put this whole block of parsing into handle, right before the response is sent.
+        stringstream contents(buf);
+
+
+        string request_type;
+        contents >> request_type;
+
+        if(sdebugging_flag)
+        {
+           cout << "Request: " << buf_ << endl;
+        }
+
+        if(request_type == "reset")
+        {
+			string resetval = mReset(mb);
+            return resetval;
+        }
+
+        if(request_type == "put")
+        {
+            string putval = mPut(buf, mb);
+            return putval;
+        }
+
+
+        else if(request_type == "list")
+        {
+            string listval = mList(buf, mb);
+            return listval;
+        }
+
+        else if(request_type == "get")
+        {
+            string getval = mGet(buf, mb);
+            return getval;
         }
 
         else if(request_type == "error")
@@ -347,10 +379,12 @@ Server::get_request(int client, MessageBuffer mb)
 	
     int nlpos = cache_.find("\n");
 	int nlpos2 = copy.find("\n");
-    cache_.erase(0, nlpos + 1);
+   
+ cache_.erase(0, nlpos + 1);
 	copy.erase(0, nlpos2 + 1);
 	
-	mb.setCache(cache_);
+    mb.setBuf(buf_);
+	mb.setCache(copy);
 	
     return request;
 }
@@ -392,9 +426,14 @@ void Server::enable_sdebugging()
 }
 
 string
-Server::get_longrequest(int client, int length) 
+Server::get_longrequest(int client, int length, MessageBuffer mb) 
 {
     // read until we get a newline
+    string caches = mb.getCache();
+    string request;
+    //cout << "!!! " << (cache_ == caches) << "!!!" << endl;
+    //cout << "CACHE_" << cache_ << endl;
+    //cout <<"CACHE: " << caches << endl;
 
     while (cache_.size() < length) {//check size
         int nread = recv(client,buf_,1024,0);
@@ -411,14 +450,22 @@ Server::get_longrequest(int client, int length)
         }
         // be sure to use append in case we have binary data
         cache_.append(buf_,nread);
+        caches.append(mb.getBuf(),nread);
     }
     // a better server would cut off anything after the newline and
     // save it in a cache
     //change request to cache
 
-    string request = cache_.substr(0, length + 1);
+    //string request = caches.substr(0, length + 1);
+    caches.erase(0, length + 1);
+    caches = "";
+   
+    request = cache_.substr(0, length + 1);
     cache_.erase(0, length + 1);
     cache_ = "";
+    
+    //cout << "SD:LFKJS:DLFKJ" << endl;
+    mb.setCache("");
     return request;
     //return substring of cache
 }

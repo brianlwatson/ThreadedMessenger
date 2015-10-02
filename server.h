@@ -42,14 +42,14 @@ protected:
     void printqueue(queue<int>);
 	vector<Message> messages;
 
-	string mPut(stringstream, MessageBuffer);
+	string mPut(string, MessageBuffer);
 	string mReset(MessageBuffer);
-	string mList(stringstream, MessageBuffer);
-	string mGet(stringstream, MessageBuffer);
+	string mList(string, MessageBuffer);
+	string mGet(string, MessageBuffer);
 
 
     string parse_request(string, int, MessageBuffer);
-    string get_longrequest(int, int);
+    string get_longrequest(int, int, MessageBuffer);
 
     void* thread_execute();
     static void* callExecute(void *arg)
