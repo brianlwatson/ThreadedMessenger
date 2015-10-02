@@ -46,7 +46,7 @@ Server::serve() {
     sem_init(&not_empty, 0, thread_count);
 
 
-    for (int i=0; i<10; i++) 
+    for (int i=0; i<thread_count; i++) 
     {
             pthread_t* thread = new pthread_t;
             pthread_create(thread, NULL, Server::callExecute, this);
@@ -57,16 +57,7 @@ Server::serve() {
     {
         if((client = accept(server_,(struct sockaddr *)&client_addr,&clientlen)) > 0)
         {
-            sem_wait(&not_empty);
-            sem_wait(&queue_lock);
-            clients.push(client);
-            
-            MessageBuffer mb;
-            mb.setSocket(client);
-            clients2.push(mb);
-            
-            sem_post(&queue_lock);
-            sem_post(&not_full);
+            qh.insertQueue(client);
         }
     }
 
@@ -82,17 +73,7 @@ void* Server::thread_execute()
 {
     while(1)
     {
-        sem_wait(&not_full);  
-        sem_wait(&queue_lock);
-        int client = clients.front();        
-        clients.pop();
-        
-        MessageBuffer mb = clients2.front();
-        clients2.pop();
-        
-        
-        sem_post(&queue_lock);
-        sem_post(&not_empty);
+        MessageBuffer mb = qh.popQueue();
         handle(mb.getSocket(), mb); //thread should die here 
     }
 
@@ -209,7 +190,7 @@ string Server::mPut(string req, MessageBuffer mb)
 
 string Server::mList(string req, MessageBuffer mb)
 {
-        cout << "LIST REQUEST: " << req << "()()()"<< endl;
+//cout << "LIST REQUEST: " << req << "()()()"<< endl;
             string request;
             string request_type;
             stringstream contents(req);
@@ -254,7 +235,7 @@ string Server::mList(string req, MessageBuffer mb)
 
 string Server::mGet(string req, MessageBuffer mb)
 {
-    cout << "GET: " << req << endl;
+   // cout << "GET: " << req << endl;
     string request;
     stringstream contents(req);
     string request_type;
@@ -303,7 +284,6 @@ string
 Server::parse_request(string buf, int client, MessageBuffer mb) 
 {
 
-    cout << "!" << buf << endl;
     string request = "";
  //put this whole block of parsing into handle, right before the response is sent.
         stringstream contents(buf);
@@ -380,10 +360,9 @@ Server::get_request(int client, MessageBuffer mb)
     int nlpos = cache_.find("\n");
 	int nlpos2 = copy.find("\n");
    
- cache_.erase(0, nlpos + 1);
+    cache_.erase(0, nlpos + 1);
 	copy.erase(0, nlpos2 + 1);
 	
-    mb.setBuf(buf_);
 	mb.setCache(copy);
 	
     return request;
@@ -414,7 +393,6 @@ Server::send_response(int client, string response) {
         nleft -= nwritten;
         ptr += nwritten;
     }
-        //cout << "COULD BE: " << response << endl;
 
     return true;
 }
@@ -429,11 +407,9 @@ string
 Server::get_longrequest(int client, int length, MessageBuffer mb) 
 {
     // read until we get a newline
+
     string caches = mb.getCache();
     string request;
-    //cout << "!!! " << (cache_ == caches) << "!!!" << endl;
-    //cout << "CACHE_" << cache_ << endl;
-    //cout <<"CACHE: " << caches << endl;
 
     while (cache_.size() < length) {//check size
         int nread = recv(client,buf_,1024,0);
@@ -450,13 +426,9 @@ Server::get_longrequest(int client, int length, MessageBuffer mb)
         }
         // be sure to use append in case we have binary data
         cache_.append(buf_,nread);
-        caches.append(mb.getBuf(),nread);
+        caches.append(buf_,nread);
     }
-    // a better server would cut off anything after the newline and
-    // save it in a cache
-    //change request to cache
 
-    //string request = caches.substr(0, length + 1);
     caches.erase(0, length + 1);
     caches = "";
    

@@ -18,6 +18,7 @@
 #include <sstream>
 #include <iostream>
 #include <fcntl.h>
+#include "QueueHandler.h"
 
 
 
@@ -72,5 +73,6 @@ protected:
 
     queue<int> clients;
     queue<MessageBuffer> clients2;
+    QueueHandler qh;
     queue<pthread_t*> threads;
 };
