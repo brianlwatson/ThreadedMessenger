@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <vector>
 #include "Message.h"
+#include "MessageBuffer.h"
 #include <string>
 #include <semaphore.h>
 #include <pthread.h>
@@ -35,13 +36,19 @@ protected:
     virtual void create();
     virtual void close_socket();
     void serve();
-    void handle(int);
-    string get_request(int);
+    void handle(int, MessageBuffer);
+    string get_request(int, MessageBuffer);
     bool send_response(int, string);
     void printqueue(queue<int>);
 	vector<Message> messages;
 
-    string parse_request(string, int);
+	string mPut(stringstream, MessageBuffer);
+	string mReset(MessageBuffer);
+	string mList(stringstream, MessageBuffer);
+	string mGet(stringstream, MessageBuffer);
+
+
+    string parse_request(string, int, MessageBuffer);
     string get_longrequest(int, int);
 
     void* thread_execute();
@@ -64,6 +71,6 @@ protected:
     sem_t not_empty;          //critical section for thread synch
 
     queue<int> clients;
-    queue<int> clients2;
+    queue<MessageBuffer> clients2;
     queue<pthread_t*> threads;
 };

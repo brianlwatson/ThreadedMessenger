@@ -60,6 +60,11 @@ Server::serve() {
             sem_wait(&not_empty);
             sem_wait(&queue_lock);
             clients.push(client);
+            
+            MessageBuffer mb;
+            mb.setSocket(client);
+            clients2.push(mb);
+            
             sem_post(&queue_lock);
             sem_post(&not_full);
         }
@@ -67,8 +72,7 @@ Server::serve() {
 
     sem_close(&message_lock);
     sem_close(&queue_lock);
-    //sem_close(&n);
-    cout << "HERERERERE: " << endl;
+    
     close_socket();
 }
 
@@ -82,37 +86,55 @@ void* Server::thread_execute()
         sem_wait(&queue_lock);
         int client = clients.front();        
         clients.pop();
+        
+        MessageBuffer mb = clients2.front();
+        clients2.pop();
+        
+        
         sem_post(&queue_lock);
         sem_post(&not_empty);
-        handle(client); //thread should die here 
+        handle(mb.getSocket(), mb); //thread should die here 
     }
 
 }
 
 
 void
-Server::handle(int client) {
-    // loop to handle all requests
-    while (1) {
-        // get a request
-        string request = get_request(client);
-        // break if client is done or an error occurred
+Server::handle(int client, MessageBuffer mb) 
+{
+    while (1) 
+    {
+        string request = get_request(client, mb);
+        mb.setRequest(request);
+
         if (request.empty())
             break;
-        // send response
 
-        string response = parse_request(request, client);
+
+        string response = parse_request(request, client, mb);
 
         bool success = send_response(client,response);
-        // break if an error occurred
+
         if (not success)
             break;
     }
     close(client);
 }
 
+
+string Server::mReset( MessageBuffer mb)
+{
+	 sem_wait(&message_lock);
+            messages.clear();
+     sem_post(&message_lock);
+	
+	return "OK\n";
+}
+
+
+
 string
-Server::parse_request(string buf_, int client) 
+Server::parse_request(string buf_, int client, MessageBuffer mb) 
 {
     string request = "";
  //put this whole block of parsing into handle, right before the response is sent.
@@ -129,11 +151,8 @@ Server::parse_request(string buf_, int client)
 
         if(request_type == "reset")
         {
-            request = "OK\n";
-        sem_wait(&message_lock);
-            messages.clear();
-        sem_post(&message_lock);
-            return request;
+			string resetval = mReset(mb);
+            return resetval;
         }
 
         if(request_type == "put")
@@ -300,46 +319,39 @@ Server::parse_request(string buf_, int client)
 }
 
 string
-Server::get_request(int client) {
+Server::get_request(int client, MessageBuffer mb) 
+{
     string request = "";
 
-    //replace request with a global cache
-    //match up with get_request
-
-    // read until we get a newline
     while (request.find("\n") == string::npos) 
     {
         int nread = recv(client,buf_,1024,0);
         if (nread < 0) 
         {
             if (errno == EINTR)
-                // the socket call was interrupted -- try again
                 continue;
             else
-                // an error occurred, so break out
                 return "";
         } 
 
         else if (nread == 0) 
         {
-            // the socket is closed
             return "";
         }
         // be sure to use append in case we have binary data
-        cache_.append(buf_,nread);// - ???????
         request.append(buf_,nread);
     }
-
-    // a better server would cut off anything after the newline and
-    // save it in a cache
-
-
+    
+	cache_ = request;
+	string copy = request;
+	
     int nlpos = cache_.find("\n");
-
-    // request = cache_.substr(0, nlpos + 1);
-    //trim cache_
+	int nlpos2 = copy.find("\n");
     cache_.erase(0, nlpos + 1);
-
+	copy.erase(0, nlpos2 + 1);
+	
+	mb.setCache(cache_);
+	
     return request;
 }
 
@@ -423,4 +435,6 @@ void Server::printqueue(queue<int> clients)
         clients.pop();
     }
 }
+
+
 
