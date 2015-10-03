@@ -2,7 +2,7 @@
 #include "server.h"
 using namespace std;
 
-class MessageBuffer
+class ClientHandler
 {
 		
 	private:
@@ -15,7 +15,7 @@ class MessageBuffer
 		
 	public:
 	
-		MessageBuffer()
+		ClientHandler()
 		{
 			buf_ = new char[1024+1];
 		}

@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <vector>
 #include "Message.h"
-#include "MessageBuffer.h"
+#include "ClientHandler.h"
 #include <string>
 #include <semaphore.h>
 #include <pthread.h>
@@ -37,22 +37,23 @@ protected:
     virtual void create();
     virtual void close_socket();
     void serve();
-    void handle(int, MessageBuffer);
-    string get_request(int, MessageBuffer);
+    void handle(int, ClientHandler);
+    string get_request(int, ClientHandler);
     bool send_response(int, string);
     void printqueue(queue<int>);
 	vector<Message> messages;
 
-	string mPut(string, MessageBuffer);
-	string mReset(MessageBuffer);
-	string mList(string, MessageBuffer);
-	string mGet(string, MessageBuffer);
+	string mPut(string, ClientHandler);
+	string mReset(ClientHandler);
+	string mList(string, ClientHandler);
+	string mGet(string, ClientHandler);
 
 
-    string parse_request(string, int, MessageBuffer);
-    string get_longrequest(int, int, MessageBuffer);
+    string parse_request(string, int, ClientHandler);
+    string get_longrequest(int, int, ClientHandler);
 
     void* thread_execute();
+    
     static void* callExecute(void *arg)
     {
         return ((Server*)arg)->thread_execute(); 
@@ -62,17 +63,16 @@ protected:
     int server_;
     int buflen_;
     string cache_;
-    char* buf_;
+    //char* buf_;
     int thread_count;
-
 
     sem_t message_lock;    //critical section for modifying message storage
     sem_t queue_lock;      //critical section for modifying threadpool
     sem_t not_full;      //critical section for thread synch
     sem_t not_empty;          //critical section for thread synch
 
-    queue<int> clients;
-    queue<MessageBuffer> clients2;
+    //queue<int> clients;
+    queue<ClientHandler> clients;
     QueueHandler qh;
     queue<pthread_t*> threads;
 };

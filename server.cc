@@ -3,19 +3,19 @@
 #include <stack>
 #include <queue>
 #include <ostream>
-
 Server::Server() {
     // setup variables
     buflen_ = 1024;
     sdebugging_flag = 0;
-    buf_ = new char[buflen_+1];
+    //buf_ = new char[buflen_+1];
     thread_count = 10;
+  
 }
 
 
 Server::~Server() 
 {
-    delete buf_;
+    //delete buf_;
 }
 
 void
@@ -39,13 +39,10 @@ Server::serve() {
     int client;
     struct sockaddr_in client_addr;
     socklen_t clientlen = sizeof(client_addr);
-
-    sem_init(&queue_lock, 0, 1); // init open
+    
     sem_init(&message_lock,0 , 1); //init locked
-    sem_init(&not_full, 0, 0);
-    sem_init(&not_empty, 0, thread_count);
-
-
+    
+    
     for (int i=0; i<thread_count; i++) 
     {
             pthread_t* thread = new pthread_t;
@@ -57,13 +54,21 @@ Server::serve() {
     {
         if((client = accept(server_,(struct sockaddr *)&client_addr,&clientlen)) > 0)
         {
-            qh.insertQueue(client);
+          qh.insertQueue(client);
         }
     }
 
     sem_close(&message_lock);
     sem_close(&queue_lock);
     
+    for(int i = 0; i < thread_count; i++)
+    {
+		pthread_t* thread = threads.front();
+		pthread_join(*thread, NULL);
+		delete(thread);
+	}
+	
+	
     close_socket();
 }
 
@@ -73,37 +78,40 @@ void* Server::thread_execute()
 {
     while(1)
     {
-        MessageBuffer mb = qh.popQueue();
-        handle(mb.getSocket(), mb); //thread should die here 
+		    ClientHandler mb = qh.popQueue();
+			handle(mb.getSocket(), mb); //thread should die here 
     }
 
 }
 
 
 void
-Server::handle(int client, MessageBuffer mb) 
+Server::handle(int client, ClientHandler mb) 
 {
     while (1) 
     {
         string request = get_request(client, mb);
         mb.setRequest(request);
+				        cout <<"2" << endl;
 
         if (request.empty())
             break;
 
-
         string response = parse_request(request, client, mb);
+		        cout <<"3" << endl;
 
         bool success = send_response(client,response);
+		        cout <<"4" << endl;
 
         if (not success)
             break;
     }
+    cout <<"CLOSING CLIENTSOCKET " << endl;
     close(client);
 }
 
 
-string Server::mReset( MessageBuffer mb)
+string Server::mReset( ClientHandler mb)
 {
 	 sem_wait(&message_lock);
             messages.clear();
@@ -112,8 +120,9 @@ string Server::mReset( MessageBuffer mb)
 	return "OK\n";
 }
 
-string Server::mPut(string req, MessageBuffer mb)
+string Server::mPut(string req, ClientHandler mb)
 {
+	cout <<"PUT " << req << endl;
             stringstream contents(req);
             string put;
             contents >> put;
@@ -137,6 +146,7 @@ string Server::mPut(string req, MessageBuffer mb)
                 return "error - incorrect put format\n";
             }
 
+	cout <<"p1\n";
             while(contents >> message)
             {
                 temp+= " " + message;
@@ -144,6 +154,7 @@ string Server::mPut(string req, MessageBuffer mb)
             temp.erase(0,1); //erase the first space (laziness)
 
             int matches = 0; //assign the index
+    cout <<"p2\n";
         sem_wait(&message_lock);
             for(int i = 0; i < messages.size(); i++)
             {
@@ -153,6 +164,7 @@ string Server::mPut(string req, MessageBuffer mb)
                 }
             }
         sem_post(&message_lock);
+     cout <<"p3\n";
             int lengthi = atoi(length.c_str());
 
 
@@ -161,7 +173,7 @@ string Server::mPut(string req, MessageBuffer mb)
                 temp = get_longrequest(mb.getSocket(), lengthi, mb);
             }   
 
-
+	cout <<"p4\n";
             Message m(name,subject, temp, matches + 1);
            // m.toString(); //test to see the contents of the message
             
@@ -170,7 +182,7 @@ string Server::mPut(string req, MessageBuffer mb)
             messages.push_back(m);
             int after = messages.size();
         sem_post(&message_lock);
-            
+     cout <<"p5\n";  
             if(sdebugging_flag)
             {
                 cout << "put: " << name << " " << subject<< " " << "req: " << request << endl;
@@ -188,9 +200,9 @@ string Server::mPut(string req, MessageBuffer mb)
             return request;
 }
 
-string Server::mList(string req, MessageBuffer mb)
+string Server::mList(string req, ClientHandler mb)
 {
-//cout << "LIST REQUEST: " << req << "()()()"<< endl;
+	cout <<"LIST" <<req << endl;
             string request;
             string request_type;
             stringstream contents(req);
@@ -233,9 +245,9 @@ string Server::mList(string req, MessageBuffer mb)
             return request;
 }
 
-string Server::mGet(string req, MessageBuffer mb)
+string Server::mGet(string req, ClientHandler mb)
 {
-   // cout << "GET: " << req << endl;
+    cout << "GET: "  <<req<< endl;
     string request;
     stringstream contents(req);
     string request_type;
@@ -251,6 +263,7 @@ string Server::mGet(string req, MessageBuffer mb)
             if(desired_index == "")
             {
                 request = "error - No index specified\n";
+                return request;
             }
 
         sem_wait(&message_lock);
@@ -268,22 +281,19 @@ string Server::mGet(string req, MessageBuffer mb)
         sem_post(&message_lock);
                         return request;
                 }
-                else
-                {
-                        request =  "error - Message Not Found\n";
-                        //break;
-                }
             }
 
         sem_post(&message_lock);
-            return request;
+        
+        cout << "\nEND GET" << endl;
+            return "error - Message Not Found :(\n";
 }
 
 
 string
-Server::parse_request(string buf, int client, MessageBuffer mb) 
+Server::parse_request(string buf, int client, ClientHandler mb) 
 {
-
+	cout <<"PARSE" << endl;
     string request = "";
  //put this whole block of parsing into handle, right before the response is sent.
         stringstream contents(buf);
@@ -292,10 +302,6 @@ Server::parse_request(string buf, int client, MessageBuffer mb)
         string request_type;
         contents >> request_type;
 
-        if(sdebugging_flag)
-        {
-           cout << "Request: " << buf_ << endl;
-        }
 
         if(request_type == "reset")
         {
@@ -324,20 +330,26 @@ Server::parse_request(string buf, int client, MessageBuffer mb)
 
         else if(request_type == "error")
         {
-            return buf_;
+            return buf;
         }
-
+	cout <<"ENDPARSE: " << endl;
      return "error - invalid command\n";
 }
 
 string
-Server::get_request(int client, MessageBuffer mb) 
+Server::get_request(int client, ClientHandler mb) 
 {
     string request = "";
-
+	char tempbuf[buflen_ + 1];
+	
+	//you only want to handle one request at a time.
+	//thus, only call recv one time
+	int r = 0;
+	
     while (request.find("\n") == string::npos) 
     {
-        int nread = recv(client,buf_,1024,0);
+		cout <<"RECEIVING  " << r<<endl;
+        int nread = recv(client,tempbuf,1024,0);
         if (nread < 0) 
         {
             if (errno == EINTR)
@@ -351,7 +363,8 @@ Server::get_request(int client, MessageBuffer mb)
             return "";
         }
         // be sure to use append in case we have binary data
-        request.append(buf_,nread);
+        request.append(tempbuf,nread);
+        r++;
     }
     
 	cache_ = request;
@@ -359,12 +372,13 @@ Server::get_request(int client, MessageBuffer mb)
 	
     int nlpos = cache_.find("\n");
 	int nlpos2 = copy.find("\n");
-   
     cache_.erase(0, nlpos + 1);
 	copy.erase(0, nlpos2 + 1);
-	
+	mb.setBuf(tempbuf);
 	mb.setCache(copy);
 	
+	cout <<"?"<<(copy == cache_) <<"?"<<endl;
+	mb.setCache(cache_);
     return request;
 }
 
@@ -404,15 +418,18 @@ void Server::enable_sdebugging()
 }
 
 string
-Server::get_longrequest(int client, int length, MessageBuffer mb) 
+Server::get_longrequest(int client, int length, ClientHandler mb) 
 {
-    // read until we get a newline
+	char* tempbuf = mb.getBuf();
 
     string caches = mb.getCache();
+    
+    cout <<"!" << (caches == cache_) <<"!" << endl;
+    
     string request;
 
     while (cache_.size() < length) {//check size
-        int nread = recv(client,buf_,1024,0);
+        int nread = recv(client, tempbuf,1024,0);
         if (nread < 0) {
             if (errno == EINTR)
                 // the socket call was interrupted -- try again
@@ -425,9 +442,11 @@ Server::get_longrequest(int client, int length, MessageBuffer mb)
             return "";
         }
         // be sure to use append in case we have binary data
-        cache_.append(buf_,nread);
-        caches.append(buf_,nread);
+        cache_.append(tempbuf,nread);
+        caches.append(tempbuf,nread);
     }
+
+	
 
     caches.erase(0, length + 1);
     caches = "";
@@ -436,10 +455,9 @@ Server::get_longrequest(int client, int length, MessageBuffer mb)
     cache_.erase(0, length + 1);
     cache_ = "";
     
-    //cout << "SD:LFKJS:DLFKJ" << endl;
     mb.setCache("");
+    delete tempbuf;
     return request;
-    //return substring of cache
 }
 
 
